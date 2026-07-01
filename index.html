@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>オルカン予想ツール</title>
+</head>
+<body>
+    <h2>本日のオルカン予想基準価額</h2>
+    
+    <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px;">
+        <p>予想基準価額: <strong id="display_nav">--</strong> 円</p>
+        <p>前日比: <span id="display_diff">--</span> 円</p>
+        <p style="font-size: 12px; color: gray;">最終更新日時: <span id="display_time">--</span></p>
+    </div>
+
+    <script>
+        // 15分おきに作られるJSONファイルを読み込む
+        fetch('result.json')
+            .then(response => response.json())
+            .then(data => {
+                // HTMLの文字を、JSONのデータに書き換える
+                document.getElementById('display_nav').innerText = Math.round(data.nav_pred).toLocaleString();
+                document.getElementById('display_diff').innerText = (data.diff_nav >= 0 ? "+" : "") + Math.round(data.diff_nav);
+                document.getElementById('display_time').innerText = data.updated_at;
+            })
+            .catch(error => console.error('データの読み込みに失敗しました:', error));
+    </script>
+</body>
+</html>
