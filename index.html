@@ -21,6 +21,7 @@
                 // HTMLの文字を、JSONのデータに書き換える
                 document.getElementById('display_nav').innerText = Math.round(data.nav_pred).toLocaleString();
                 document.getElementById('display_diff').innerText = (data.diff_nav >= 0 ? "+" : "") + Math.round(data.diff_nav);
+                document.getElementById('display_percent').innerText = (data.r_pred_percent >= 0 ? "+" : "") + data.r_pred_percent.toFixed(2);
                 document.getElementById('display_time').innerText = data.updated_at;
             })
             .catch(error => console.error('データの読み込みに失敗しました:', error));
