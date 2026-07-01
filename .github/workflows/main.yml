@@ -1,0 +1,37 @@
+name: Update Orcan NAV
+
+# いつこの処理を動かすかの設定
+on:
+  schedule:
+    - cron: '*/15 * * * *' # 15分おきに実行
+  workflow_dispatch: # 手動で実行できるボタンを追加
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # 最新のLinux(Ubuntu)環境を借りる
+    permissions:
+      contents: write # リポジトリ内のファイルを書き換える権限
+
+    steps:
+      - name: リポジトリのファイルをチェックアウト
+        uses: actions/checkout@v4
+
+      - name: Pythonのセットアップ
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: 必要なライブラリのインストール
+        run: pip install yfinance
+
+      - name: 予想スクリプトの実行
+        run: python orcan_api_proto.py
+
+      - name: 新しいresult.jsonをコミットしてプッシュ
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add result.json
+          # 変更がある場合のみコミットしてプッシュする
+          git commit -m "Auto-update result.json" || exit 0
+          git push
