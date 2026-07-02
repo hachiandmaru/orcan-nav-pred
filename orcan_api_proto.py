@@ -65,7 +65,7 @@ def main():
         "fx_percent": delta_fx * 100
     }
 
-　　# 【変更点】既存のデータを読み込んでから追加する
+    # 【変更点】既存のデータを読み込んでから追加する
     file_path = "result.json"
     history_data = []
 
