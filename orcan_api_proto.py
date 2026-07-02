@@ -1,4 +1,4 @@
-# coding: cp932
+# coding: utf-8
 import yfinance as yf
 import json
 from datetime import datetime
