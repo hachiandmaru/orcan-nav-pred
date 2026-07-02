@@ -54,7 +54,7 @@ def main():
     diff_sign = "+" if diff_nav >= 0 else "-"
 
     # 保存するデータを辞書（Dictionary）にまとめる
-    export_data = {
+    current_data = {
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         "date": datetime.now().strftime("%Y-%m-%d"), # カレンダー用の日付
         "nav_base": NAV_BASE,
