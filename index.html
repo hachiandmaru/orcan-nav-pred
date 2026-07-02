@@ -46,16 +46,23 @@
                 const tbody = document.getElementById('history_table_body');
                 tbody.innerHTML = ''; // 表を一旦クリア
 
-                dataList.forEach(item => {
+                // itemの横に index（何番目のデータか）を追加
+                dataList.forEach((item, index) => {
                     const tr = document.createElement('tr');
                     
                     // プラスマイナスの符号付きの文字列を作成
                     const diffStr = (item.diff_nav >= 0 ? "+" : "") + Math.round(item.diff_nav);
                     const percentStr = (item.r_pred_percent >= 0 ? "+" : "") + item.r_pred_percent.toFixed(2);
 
-                    // 実際の基準価額（毎朝手動で入力する NAV_BASE を、翌日のデータとして表示するロジック）
-                    // ※ ここは少し複雑なので、まずは「確認待ち」として表示します
                     let actualNavText = "<span style='color: gray; font-size: 0.8em;'>確認待ち</span>";
+                    
+                    // 【完全自動の答え合わせロジック】
+                    // データは新しい順（0番目が今日、1番目が昨日...）に並んでいます。
+                    // 過去のデータ（1番目以降）の「実際の基準価額」は、
+                    // 1つ新しいデータ（翌日のデータ：index - 1）のベース価格（nav_base）を引っ張ってくるだけ！
+                    if (index > 0 && dataList[index - 1].nav_base) {
+                        actualNavText = "<strong>" + dataList[index - 1].nav_base.toLocaleString() + " 円</strong>";
+                    }
                     
                     tr.innerHTML = `
                         <td>${item.date}</td>
