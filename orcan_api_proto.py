@@ -56,6 +56,7 @@ def main():
     # 保存するデータを辞書（Dictionary）にまとめる
     export_data = {
         "updated_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "date": datetime.now().strftime("%Y-%m-%d"), # カレンダー用の日付
         "nav_base": NAV_BASE,
         "nav_pred": nav_pred,
         "r_pred_percent": r_pred * 100,
@@ -64,9 +65,33 @@ def main():
         "fx_percent": delta_fx * 100
     }
 
-    # result.json という名前でファイルを書き出し（上書き）
-    with open("result.json", "w", encoding="utf-8") as f:
-        json.dump(export_data, f, indent=4, ensure_ascii=False)
+　　# 【変更点】既存のデータを読み込んでから追加する
+    file_path = "result.json"
+    history_data = []
+
+    try:
+        # もし既存のファイルがあれば読み込む
+        with open(file_path, "r", encoding="utf-8") as f:
+            history_data = json.load(f)
+            # 万が一データがリスト形式でなければ空リストにする
+            if not isinstance(history_data, list):
+                history_data = []
+    except (FileNotFoundError, json.JSONDecodeError):
+        # ファイルがない、または壊れている場合は新規作成
+        pass
+
+    # 今日のデータと同じ日付(date)のデータが既にリストにあれば、それを削除（上書きするため）
+    history_data = [item for item in history_data if item.get("date") != current_data["date"]]
+
+    # 最新のデータをリストの先頭に追加
+    history_data.insert(0, current_data)
+
+    # 過去30日分だけ保持する（ファイルが重くなるのを防ぐため）
+    history_data = history_data[:30]
+
+    # result.json を上書き保存
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(history_data, f, indent=4, ensure_ascii=False)
     
     print("結果を result.json に保存しました。")
 
