@@ -6,7 +6,7 @@ from datetime import datetime
 # ==========================================
 # 設定パラメーター
 # ==========================================
-NAV_BASE = 38017  
+NAV_BASE = 38267 
 
 def get_yfinance_change(symbol):
     """yfinanceを使って過去5日分のデータを取得し、直近2日間の終値から前日比を計算する"""
