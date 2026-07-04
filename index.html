@@ -2,64 +2,194 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>オルカン予想ツール</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>オルカン予想・積立ツール</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+        h2, h3 {
+            color: #2c3e50;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 8px;
+        }
+        .card {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
+        }
+        .pred-box {
+            background-color: #e8f4fd;
+            border-left: 5px solid #3498db;
+        }
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            margin-bottom: 20px;
+            background-color: #fff;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        /* シミュレーター用のスタイル */
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .input-row {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        input[type="range"] {
+            flex: 1;
+        }
+        input[type="number"] {
+            width: 80px;
+            padding: 5px;
+            font-size: 16px;
+        }
+        .result-summary {
+            display: flex;
+            justify-content: space-around;
+            background-color: #f1f8e9;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 15px;
+            text-align: center;
+            border-left: 5px solid #7cb342;
+        }
+        .result-val {
+            font-size: 20px;
+            font-weight: bold;
+            color: #33691e;
+        }
+        .chart-container {
+            position: relative;
+            margin-top: 20px;
+            height: 350px;
+            width: 100%;
+        }
+    </style>
 </head>
 <body>
+
     <h2>本日のオルカン予想基準価額</h2>
-    <h3 style="margin-top: 30px;">直近の予想と結果の履歴</h3>
-    <table border="1" style="border-collapse: collapse; width: 100%; max-width: 600px; text-align: center;">
-        <thead style="background-color: #eee;">
-            <tr>
-                <th>日付</th>
-                <th>予想価格</th>
-                <th>予想前日比</th>
-                <th>実際の基準価額</th> </tr>
-        </thead>
-        <tbody id="history_table_body">
-            </tbody>
-    </table>
     
-    <div style="background-color: #f0f8ff; padding: 15px; border-radius: 8px;">
-        <p>予想基準価額: <strong id="display_nav">--</strong> 円
+    <div class="card pred-box">
+        <p style="margin-top: 0;">予想基準価額: <strong id="display_nav" style="font-size: 24px;">--</strong> 円
             <span style="font-size: 0.8em; color: gray;">(前回基準価額: <span id="display_base">--</span> 円)</span>
-    　　</p>
-        <p>前日比: <span id="display_diff">--</span> 円 (<span id="display_percent">--</span>%)</p>
-        <p style="font-size: 12px; color: gray;">最終更新日時: <span id="display_time">--</span></p>
+        </p>
+        <p>前日比: <span id="display_diff" style="font-weight: bold;">--</span> 円 (<span id="display_percent" style="font-weight: bold;">--</span>%)</p>
+        <p style="font-size: 12px; color: gray; margin-bottom: 0;">最終更新日時: <span id="display_time">--</span></p>
     </div>
 
-<script>
+    <h3>直近の予想と結果の履歴</h3>
+    <div class="card" style="padding: 0; overflow-x: auto;">
+        <table style="margin: 0; border: none;">
+            <thead>
+                <tr>
+                    <th>日付</th>
+                    <th>予想価格</th>
+                    <th>予想前日比</th>
+                    <th>実際の基準価額</th>
+                </tr>
+            </thead>
+            <tbody id="history_table_body">
+                </tbody>
+        </table>
+    </div>
+
+    <h3>資産運用シミュレーション</h3>
+    <div class="card">
+        <div class="form-group">
+            <label class="form-label">毎月積立額</label>
+            <div class="input-row">
+                <input type="range" id="slide_amount" min="0.1" max="30" step="0.1" value="10">
+                <input type="number" id="num_amount" min="0.1" max="30" step="0.1" value="10"> 万円
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">投資期間</label>
+            <div class="input-row">
+                <input type="range" id="slide_years" min="1" max="40" step="1" value="15">
+                <input type="number" id="num_years" min="1" max="40" step="1" value="15"> 年
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">想定利回り（年率）</label>
+            <div class="input-row">
+                <input type="range" id="slide_rate" min="0" max="30" step="0.1" value="20.1">
+                <input type="number" id="num_rate" min="0" max="30" step="0.1" value="20.1"> %
+            </div>
+        </div>
+
+        <div class="result-summary">
+            <div>
+                <div>積立金額（元本）</div>
+                <div id="res_principal" class="result-val">--</div>
+            </div>
+            <div>
+                <div>運用収益</div>
+                <div id="res_earnings" class="result-val">--</div>
+            </div>
+            <div>
+                <div>資産総額</div>
+                <div id="res_total" class="result-val" style="font-size: 24px; color: #1b5e20;">--</div>
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <canvas id="simChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // ==========================================
+        // 1. 予想データおよび履歴テーブルの制御
+        // ==========================================
         fetch('result.json')
             .then(response => response.json())
             .then(dataList => {
-                // 万が一データが古い形式（リストではない）場合は処理を止める
                 if (!Array.isArray(dataList) || dataList.length === 0) return;
 
-                // --- 1. 最新のデータ（配列の0番目）を上部のメイン枠に表示 ---
+                // メイン枠の表示
                 const latestData = dataList[0];
                 document.getElementById('display_nav').innerText = Math.round(latestData.nav_pred).toLocaleString();
-                document.getElementById('display_diff').innerText = (latestData.diff_nav >= 0 ? "+" : "") + Math.round(latestData.diff_nav);
+                document.getElementById('display_diff').innerText = (latestData.diff_nav >= 0 ? "+" : "") + Math.round(latestData.diff_nav).toLocaleString();
                 document.getElementById('display_percent').innerText = (latestData.r_pred_percent >= 0 ? "+" : "") + latestData.r_pred_percent.toFixed(2);
                 document.getElementById('display_base').innerText = latestData.nav_base.toLocaleString();
                 document.getElementById('display_time').innerText = latestData.updated_at;
 
-                // --- 2. 履歴データ（配列全体）を表にループで追加 ---
+                // 履歴テーブルの生成
                 const tbody = document.getElementById('history_table_body');
-                tbody.innerHTML = ''; // 表を一旦クリア
+                tbody.innerHTML = '';
 
-                // itemの横に index（何番目のデータか）を追加
                 dataList.forEach((item, index) => {
                     const tr = document.createElement('tr');
-                    
-                    // プラスマイナスの符号付きの文字列を作成
-                    const diffStr = (item.diff_nav >= 0 ? "+" : "") + Math.round(item.diff_nav);
+                    const diffStr = (item.diff_nav >= 0 ? "+" : "") + Math.round(item.diff_nav).toLocaleString();
                     const percentStr = (item.r_pred_percent >= 0 ? "+" : "") + item.r_pred_percent.toFixed(2);
 
                     let actualNavText = "<span style='color: gray; font-size: 0.8em;'>確認待ち</span>";
-                    
-                    // 【完全自動の答え合わせロジック】
-                    // データは新しい順（0番目が今日、1番目が昨日...）に並んでいます。
-                    // 過去のデータ（1番目以降）の「実際の基準価額」は、
-                    // 1つ新しいデータ（翌日のデータ：index - 1）のベース価格（nav_base）を引っ張ってくるだけ！
                     if (index > 0 && dataList[index - 1].nav_base) {
                         actualNavText = "<strong>" + dataList[index - 1].nav_base.toLocaleString() + " 円</strong>";
                     }
@@ -67,13 +197,139 @@
                     tr.innerHTML = `
                         <td>${item.date}</td>
                         <td>${Math.round(item.nav_pred).toLocaleString()} 円</td>
-                        <td style="color: ${item.diff_nav >= 0 ? 'red' : 'blue'};">${diffStr} 円 (${percentStr}%)</td>
+                        <td style="color: ${item.diff_nav >= 0 ? '#e74c3c' : '#3498db'}; font-weight: bold;">${diffStr} 円 (${percentStr}%)</td>
                         <td>${actualNavText}</td>
                     `;
                     tbody.appendChild(tr);
                 });
             })
             .catch(error => console.error('データの読み込みに失敗しました:', error));
+
+        // ==========================================
+        // 2. 積立シミュレーターのロジック
+        // ==========================================
+        const ctx = document.getElementById('simChart').getContext('2d');
+        let simChart = null;
+
+        // 各種入力要素の取得
+        const inputs = {
+            amount: { slide: document.getElementById('slide_amount'), num: document.getElementById('num_amount') },
+            years: { slide: document.getElementById('slide_years'), num: document.getElementById('num_years') },
+            rate: { slide: document.getElementById('slide_rate'), num: document.getElementById('num_rate') }
+        };
+
+        // スライダーと数値入力ボックスの値を同期させるイベント
+        function setupSync(target) {
+            target.slide.addEventListener('input', (e) => { target.num.value = e.target.value; calculateSimulation(); });
+            target.num.addEventListener('input', (e) => { target.slide.value = e.target.value; calculateSimulation(); });
+        }
+        setupSync(inputs.amount);
+        setupSync(inputs.years);
+        setupSync(inputs.rate);
+
+        // シミュレーション計算およびグラフ更新関数
+        function calculateSimulation() {
+            const monthlyAmount = parseFloat(inputs.amount.num.value) * 10000; // 円単位に変換
+            const years = parseInt(inputs.years.num.value);
+            const annualRate = parseFloat(inputs.rate.num.value) / 100;
+
+            const labels = [];
+            const principalData = [];
+            const totalData = [];
+
+            let currentTotal = 0;
+            let currentPrincipal = 0;
+            const monthlyRate = annualRate / 12;
+
+            labels.push("初期");
+            principalData.push(0);
+            totalData.push(0);
+
+            // 毎月複利での計算ロジック
+            for (let y = 1; y <= years; y++) {
+                for (let m = 1; m <= 12; m++) {
+                    currentPrincipal += monthlyAmount;
+                    currentTotal = (currentTotal + monthlyAmount) * (1 + monthlyRate);
+                }
+                labels.push(y + "年目");
+                principalData.push(Math.round(currentPrincipal / 10000)); // 万円単位
+                totalData.push(Math.round(currentTotal / 10000));
+            }
+
+            // 最終結果の数値を画面に反映
+            const finalPrincipal = currentPrincipal / 10000;
+            const finalTotal = currentTotal / 10000;
+            const finalEarnings = finalTotal - finalPrincipal;
+
+            document.getElementById('res_principal').innerText = formatResultText(finalPrincipal);
+            document.getElementById('res_earnings').innerText = "+ " + formatResultText(finalEarnings);
+            document.getElementById('res_total').innerText = formatResultText(finalTotal);
+
+            // グラフの描画・更新
+            updateChart(labels, principalData, totalData);
+        }
+
+        function formatResultText(val) {
+            if (val >= 10000) {
+                const oku = Math.floor(val / 10000);
+                const man = Math.round(val % 10000);
+                return oku + "億" + (man > 0 ? man.toLocaleString() : "") + "万円";
+            }
+            return Math.round(val).toLocaleString() + "万円";
+        }
+
+        function updateChart(labels, principalData, totalData) {
+            if (simChart) {
+                simChart.data.labels = labels;
+                simChart.data.datasets[0].data = totalData;
+                simChart.data.datasets[1].data = principalData;
+                simChart.update();
+            } else {
+                simChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: '資産総額（元本+収益）',
+                                data: totalData,
+                                backgroundColor: 'rgba(52, 152, 219, 0.2)',
+                                borderColor: '#3498db',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.1
+                            },
+                            {
+                                label: '積立金額（元本）',
+                                data: principalData,
+                                backgroundColor: 'rgba(189, 195, 199, 0.4)',
+                                borderColor: '#bdc3c7',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.1
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                ticks: { callback: (value) => value + '万' },
+                                grid: { color: '#eaeaea' }
+                            },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+        }
+
+        // 初回読み込み時にシミュレーションを実行
+        calculateSimulation();
     </script>
 </body>
 </html>
