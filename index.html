@@ -191,6 +191,16 @@
 
                     let actualNavText = "<span style='color: gray; font-size: 0.8em;'>確認待ち</span>";
                     if (index > 0 && dataList[index - 1].nav_base) {
+                        const actualNav = dataList[index - 1].nav_base;
+                        const prevNav = item.nav_base; // その日の計算ベース（前日の実際の価格）
+                        
+                        // 実際の騰落率を計算
+                        const actualDiff = actualNav - prevNav;
+                        const actualPercent = (actualDiff / prevNav) * 100;
+                        
+                        const actualDiffStr = (actualDiff >= 0 ? "+" : "") + actualDiff.toLocaleString();
+                        const actualPercentStr = (actualPercent >= 0 ? "+" : "") + actualPercent.toFixed(2);
+                        
                         actualNavText = "<strong>" + dataList[index - 1].nav_base.toLocaleString() + " 円</strong>";
                     }
                     
