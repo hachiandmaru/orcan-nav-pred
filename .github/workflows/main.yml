@@ -22,7 +22,7 @@ jobs:
           python-version: '3.10'
 
       - name: 必要なライブラリのインストール
-        run: pip install yfinance
+        run: pip install yfinance requests beautifulsoup4
 
       - name: 予想スクリプトの実行
         run: python orcan_api_proto.py
