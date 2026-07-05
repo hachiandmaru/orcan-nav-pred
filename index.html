@@ -201,7 +201,7 @@
                         const actualDiffStr = (actualDiff >= 0 ? "+" : "") + actualDiff.toLocaleString();
                         const actualPercentStr = (actualPercent >= 0 ? "+" : "") + actualPercent.toFixed(2);
                         
-                        actualNavText = "<strong>" + dataList[index - 1].nav_base.toLocaleString() + " 円</strong>";
+                        actualNavText = "<strong>" + dataList[index - 1].nav_base.toLocaleString() + " 円</strong>"
                             + "<br><span style='color:" + (actualDiff >= 0 ? "#e74c3c" : "#3498db") 
                             + ";font-size:0.85em;'>" + actualDiffStr + "円 (" + actualPercentStr + "%)</span>";
                     }
