@@ -16,8 +16,13 @@ def get_actual_nav():
     try:
         res = requests.get(url, headers=headers)
         soup = BeautifulSoup(res.text, 'html.parser')
-        # みんかぶの基準価額表示クラス（.stock_price）を探す
-        price_element = soup.select_one('.stock_price')
+        # meta descriptionから取得（最も安定）
+        meta = soup.find('meta', attrs={'name': 'description'})
+        if meta:
+            content = meta.get('content', '')
+            match = re.search(r'基準価額(\d[\d,]+)円', content)
+            if match:
+                return int(match.group(1).replace(',', ''))
         if price_element:
             price_str = price_element.text
             # "38,009円" などの文字列から数字部分だけを抜き出す
