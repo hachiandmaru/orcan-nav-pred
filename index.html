@@ -207,7 +207,7 @@
                     }
                     
                     tr.innerHTML = `
-                        <td>${item.date}</td>
+                        <td>${item.date} (${['日','月','火','水','木','金','土'][new Date(item.date + 'T00:00:00').getDay()]})</td>
                         <td>${Math.round(item.nav_pred).toLocaleString()} 円</td>
                         <td style="color: ${item.diff_nav >= 0 ? '#e74c3c' : '#3498db'}; font-weight: bold;">${diffStr} 円 (${percentStr}%)</td>
                         <td>${actualNavText}</td>
