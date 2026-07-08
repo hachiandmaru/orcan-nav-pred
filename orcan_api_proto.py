@@ -69,6 +69,21 @@ def main():
     else:
         print(f"[INFO] 最新の基準価額 {NAV_BASE}円 を自動取得しました。")
 
+    existing_nav_base = None
+    try:
+        with open("result.json", "r", encoding="utf-8") as f:
+            history_data = json.load(f)
+            today = datetime.now().strftime("%Y-%m-%d")
+            for item in history_data:
+                if item.get("date") == today:
+                    existing_nav_base = item.get("nav_base")
+                    break
+    except Exception:
+        pass
+    if existing_nav_base is not None:
+        NAV_BASE = existing_nav_base
+        print(f"[INFO] 本日の初回ベース {NAV_BASE}円 を維持します。")
+
     print("--- Yahoo Financeから最新為替・株価データを取得中... ---")
     val_global = get_yfinance_change("ACWI") 
     val_japan = 0.0
