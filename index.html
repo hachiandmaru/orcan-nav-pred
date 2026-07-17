@@ -180,6 +180,13 @@
                 document.getElementById('display_base').innerText = latestData.nav_base.toLocaleString();
                 document.getElementById('display_time').innerText = latestData.updated_at;
 
+                // 実測値（nav_actual）が存在する最新日付を調べる
+                // これより古いのに実測値が無い日付 ＝ 基準価額が算出されない日（土日祝）とみなす
+                let latestActualDate = "";
+                dataList.forEach(it => {
+                    if (it.nav_actual && it.date > latestActualDate) latestActualDate = it.date;
+                });
+
                 // 履歴テーブルの生成
                 const tbody = document.getElementById('history_table_body');
                 tbody.innerHTML = '';
@@ -190,22 +197,33 @@
                     const percentStr = (item.r_pred_percent >= 0 ? "+" : "") + item.r_pred_percent.toFixed(2);
 
                     let actualNavText = "<span style='color: gray; font-size: 0.8em;'>確認待ち</span>";
-                    if (index > 0 && dataList[index - 1].nav_base) {
-                        const actualNav = dataList[index - 1].nav_base;
-                        const prevNav = item.nav_base; // その日の計算ベース（前日の実際の価格）
-                        
-                        // 実際の騰落率を計算
-                        const actualDiff = actualNav - prevNav;
-                        const actualPercent = (actualDiff / prevNav) * 100;
-                        
+
+                    if (item.nav_actual) {
+                        // 前営業日の実測値を探す（無ければその日の計算ベースを使う）
+                        let prevActual = null;
+                        for (let j = index + 1; j < dataList.length; j++) {
+                            if (dataList[j].nav_actual) { prevActual = dataList[j].nav_actual; break; }
+                        }
+                        const base = (prevActual !== null) ? prevActual : item.nav_base;
+
+                        // 実際の前日比
+                        const actualDiff = item.nav_actual - base;
+                        const actualPercent = (actualDiff / base) * 100;
                         const actualDiffStr = (actualDiff >= 0 ? "+" : "") + actualDiff.toLocaleString();
                         const actualPercentStr = (actualPercent >= 0 ? "+" : "") + actualPercent.toFixed(2);
-                        
-                        actualNavText = "<strong>" + dataList[index - 1].nav_base.toLocaleString() + " 円</strong>"
-                            + "<br><span style='color:" + (actualDiff >= 0 ? "#e74c3c" : "#3498db") 
-                            + ";font-size:0.85em;'>" + actualDiffStr + "円 (" + actualPercentStr + "%)</span>";
+
+                        // 予想との差（実際 − 予想）
+                        const errVal = item.nav_actual - Math.round(item.nav_pred);
+                        const errStr = (errVal >= 0 ? "+" : "") + errVal.toLocaleString();
+
+                        actualNavText = "<strong>" + item.nav_actual.toLocaleString() + " 円</strong>"
+                            + "<br><span style='color:" + (actualDiff >= 0 ? "#e74c3c" : "#3498db")
+                            + ";font-size:0.85em;'>" + actualDiffStr + "円 (" + actualPercentStr + "%)</span>"
+                            + "<br><span style='color:#7f8c8d;font-size:0.8em;'>予想との差 " + errStr + "円</span>";
+                    } else if (latestActualDate && item.date < latestActualDate) {
+                        actualNavText = "<span style='color: gray; font-size: 0.8em;'>休場</span>";
                     }
-                    
+
                     tr.innerHTML = `
                         <td>${item.date} (${['日','月','火','水','木','金','土'][new Date(item.date + 'T00:00:00').getDay()]})</td>
                         <td>${Math.round(item.nav_pred).toLocaleString()} 円</td>
