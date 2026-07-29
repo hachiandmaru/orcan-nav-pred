@@ -1,12 +1,12 @@
 [
     {
-        "updated_at": "2026-07-29 07:30:49",
+        "updated_at": "2026-07-29 10:17:39",
         "date": "2026-07-29",
         "nav_base": 38183,
-        "nav_pred": 38203.034983324644,
-        "r_pred_percent": 0.052470951273186905,
-        "diff_nav": 20.03498332464369,
-        "acwi_percent": -0.04527994563248376,
+        "nav_pred": NaN,
+        "r_pred_percent": NaN,
+        "diff_nav": NaN,
+        "acwi_percent": NaN,
         "fx_percent": 0.09779517850930901
     },
     {
