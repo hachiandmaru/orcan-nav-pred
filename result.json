@@ -1,5 +1,15 @@
 [
     {
+        "updated_at": "2026-09-18 00:17:32",
+        "date": "2026-09-18",
+        "nav_base": 37161,
+        "nav_pred": NaN,
+        "r_pred_percent": NaN,
+        "diff_nav": NaN,
+        "acwi_percent": NaN,
+        "fx_percent": 0.48175458082555644
+    },
+    {
         "updated_at": "2026-09-17 22:08:53",
         "date": "2026-09-17",
         "nav_base": 37058,
@@ -316,16 +326,5 @@
         "acwi_percent": 0.8369745701472525,
         "fx_percent": 0.5133188116656923,
         "nav_actual": 38395
-    },
-    {
-        "updated_at": "2026-08-07 23:48:00",
-        "date": "2026-08-07",
-        "nav_base": 38227,
-        "nav_pred": 38109.48616947069,
-        "r_pred_percent": -0.30741054890340846,
-        "diff_nav": -117.5138305293076,
-        "acwi_percent": -0.24921738098714952,
-        "fx_percent": -0.05833855774196398,
-        "nav_actual": 38302
     }
 ]
